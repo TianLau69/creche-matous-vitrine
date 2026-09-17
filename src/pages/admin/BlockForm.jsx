@@ -10,6 +10,9 @@ export const BLOCK_TYPES = [
   { value: 'text_image', label: 'Texte + image' },
   { value: 'rich_text', label: 'Texte simple' },
   { value: 'contact', label: 'Bloc contact' },
+  { value: 'gallery', label: 'Galerie photo' },
+  { value: 'stats', label: 'Chiffres clés' },
+  { value: 'testimonials', label: 'Témoignages' },
 ]
 
 const BRAND_COLORS = [
@@ -21,13 +24,19 @@ const BRAND_COLORS = [
 function defaultContentFor(type) {
   switch (type) {
     case 'hero':
-      return { title: '', subtitle: '', primary_label: '', primary_link: '', secondary_label: '', secondary_link: '' }
+      return { title: '', subtitle: '', primary_label: '', primary_link: '', secondary_label: '', secondary_link: '', image_url: '' }
     case 'values_strip':
       return { items: [{ title: '', text: '' }] }
     case 'doors_grid':
-      return { title: '', subtitle: '', items: [{ tag: 'CRÈCHE', name: '', description: '', color: '#004aad', link: '/contact' }] }
+      return { title: '', subtitle: '', items: [{ tag: 'CRÈCHE', name: '', description: '', color: '#004aad', link: '/contact', image_url: '' }] }
     case 'service_list':
-      return { title: '', subtitle: '', items: [{ icon: 'cat', title: '', description: '' }] }
+      return { title: '', subtitle: '', items: [{ icon: 'cat', title: '', description: '', image_url: '' }] }
+    case 'gallery':
+      return { title: '', subtitle: '', items: [{ image_url: '', caption: '', size: 'normal' }] }
+    case 'stats':
+      return { title: '', items: [{ number: '', label: '' }] }
+    case 'testimonials':
+      return { title: '', subtitle: '', items: [{ quote: '', author: '', detail: '', photo_url: '' }] }
     case 'text_image':
       return { title: '', text: '', image_url: '', image_position: 'right' }
     case 'rich_text':
@@ -133,6 +142,8 @@ export default function BlockForm({ type, content, onChange }) {
             <input type="text" value={content.secondary_link || ''} onChange={(e) => onChange({ ...content, secondary_link: e.target.value })} placeholder="/contact" />
           </div>
         </div>
+        <label>Photo (remplace l'illustration par défaut si renseignée)</label>
+        <ImageUploadField value={content.image_url} onChange={(url) => onChange({ ...content, image_url: url })} />
       </>
     )
   }
@@ -184,10 +195,12 @@ export default function BlockForm({ type, content, onChange }) {
                 <input type="text" value={item.link || ''} onChange={(e) => list.update(i, 'link', e.target.value)} />
               </div>
             </div>
+            <label>Photo de fond (optionnelle — sinon, couleur unie)</label>
+            <ImageUploadField value={item.image_url} onChange={(url) => list.update(i, 'image_url', url)} />
             <ItemControls onUp={() => list.move(i, -1)} onDown={() => list.move(i, 1)} onRemove={() => list.remove(i)} />
           </div>
         ))}
-        <button type="button" className="btn small ghost" onClick={() => list.add({ tag: 'CRÈCHE', name: '', description: '', color: '#004aad', link: '/contact' })}>
+        <button type="button" className="btn small ghost" onClick={() => list.add({ tag: 'CRÈCHE', name: '', description: '', color: '#004aad', link: '/contact', image_url: '' })}>
           + Ajouter une crèche
         </button>
       </>
@@ -204,7 +217,7 @@ export default function BlockForm({ type, content, onChange }) {
         <textarea value={content.subtitle || ''} onChange={(e) => onChange({ ...content, subtitle: e.target.value })} />
         {list.items.map((item, i) => (
           <div className="repeat-item" key={i}>
-            <label>Icône</label>
+            <label>Icône (utilisée si aucune photo n'est ajoutée)</label>
             <select value={item.icon || 'cat'} onChange={(e) => list.update(i, 'icon', e.target.value)}>
               {ICON_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
             </select>
@@ -212,10 +225,12 @@ export default function BlockForm({ type, content, onChange }) {
             <input type="text" value={item.title || ''} onChange={(e) => list.update(i, 'title', e.target.value)} />
             <label>Description</label>
             <textarea value={item.description || ''} onChange={(e) => list.update(i, 'description', e.target.value)} />
+            <label>Photo (optionnelle, remplace l'icône)</label>
+            <ImageUploadField value={item.image_url} onChange={(url) => list.update(i, 'image_url', url)} />
             <ItemControls onUp={() => list.move(i, -1)} onDown={() => list.move(i, 1)} onRemove={() => list.remove(i)} />
           </div>
         ))}
-        <button type="button" className="btn small ghost" onClick={() => list.add({ icon: 'cat', title: '', description: '' })}>
+        <button type="button" className="btn small ghost" onClick={() => list.add({ icon: 'cat', title: '', description: '', image_url: '' })}>
           + Ajouter un service
         </button>
       </>
@@ -247,6 +262,98 @@ export default function BlockForm({ type, content, onChange }) {
         <input type="text" value={content.title || ''} onChange={(e) => onChange({ ...content, title: e.target.value })} />
         <label>Texte</label>
         <textarea rows={6} value={content.text || ''} onChange={(e) => onChange({ ...content, text: e.target.value })} />
+      </>
+    )
+  }
+
+  if (type === 'gallery') {
+    const list = useListHelpers(content, onChange, 'items')
+    return (
+      <>
+        <label>Titre de la section (optionnel)</label>
+        <input type="text" value={content.title || ''} onChange={(e) => onChange({ ...content, title: e.target.value })} />
+        <label>Sous-titre</label>
+        <textarea value={content.subtitle || ''} onChange={(e) => onChange({ ...content, subtitle: e.target.value })} />
+        {list.items.map((item, i) => (
+          <div className="repeat-item" key={i}>
+            <label>Photo</label>
+            <ImageUploadField value={item.image_url} onChange={(url) => list.update(i, 'image_url', url)} />
+            <label>Légende (optionnelle)</label>
+            <input type="text" value={item.caption || ''} onChange={(e) => list.update(i, 'caption', e.target.value)} />
+            <label>Taille</label>
+            <select value={item.size || 'normal'} onChange={(e) => list.update(i, 'size', e.target.value)}>
+              <option value="normal">Normale</option>
+              <option value="large">Grande (prend 2 colonnes)</option>
+            </select>
+            <ItemControls onUp={() => list.move(i, -1)} onDown={() => list.move(i, 1)} onRemove={() => list.remove(i)} />
+          </div>
+        ))}
+        <button type="button" className="btn small ghost" onClick={() => list.add({ image_url: '', caption: '', size: 'normal' })}>
+          + Ajouter une photo
+        </button>
+      </>
+    )
+  }
+
+  if (type === 'stats') {
+    const list = useListHelpers(content, onChange, 'items')
+    return (
+      <>
+        <label>Titre de la section (optionnel)</label>
+        <input type="text" value={content.title || ''} onChange={(e) => onChange({ ...content, title: e.target.value })} />
+        <p className="muted">Idéal pour 3 ou 4 chiffres marquants (ex. "3 crèches", "5 ans d'expérience").</p>
+        {list.items.map((item, i) => (
+          <div className="repeat-item" key={i}>
+            <div className="field-row">
+              <div>
+                <label>Chiffre</label>
+                <input type="text" value={item.number || ''} onChange={(e) => list.update(i, 'number', e.target.value)} placeholder="3" />
+              </div>
+              <div>
+                <label>Légende</label>
+                <input type="text" value={item.label || ''} onChange={(e) => list.update(i, 'label', e.target.value)} placeholder="crèches à Lyon" />
+              </div>
+            </div>
+            <ItemControls onUp={() => list.move(i, -1)} onDown={() => list.move(i, 1)} onRemove={() => list.remove(i)} />
+          </div>
+        ))}
+        <button type="button" className="btn small ghost" onClick={() => list.add({ number: '', label: '' })}>
+          + Ajouter un chiffre
+        </button>
+      </>
+    )
+  }
+
+  if (type === 'testimonials') {
+    const list = useListHelpers(content, onChange, 'items')
+    return (
+      <>
+        <label>Titre de la section</label>
+        <input type="text" value={content.title || ''} onChange={(e) => onChange({ ...content, title: e.target.value })} />
+        <label>Sous-titre</label>
+        <textarea value={content.subtitle || ''} onChange={(e) => onChange({ ...content, subtitle: e.target.value })} />
+        {list.items.map((item, i) => (
+          <div className="repeat-item" key={i}>
+            <label>Témoignage</label>
+            <textarea value={item.quote || ''} onChange={(e) => list.update(i, 'quote', e.target.value)} />
+            <div className="field-row">
+              <div>
+                <label>Auteur</label>
+                <input type="text" value={item.author || ''} onChange={(e) => list.update(i, 'author', e.target.value)} placeholder="Camille D." />
+              </div>
+              <div>
+                <label>Détail (optionnel)</label>
+                <input type="text" value={item.detail || ''} onChange={(e) => list.update(i, 'detail', e.target.value)} placeholder="propriétaire de Nala" />
+              </div>
+            </div>
+            <label>Photo (optionnelle)</label>
+            <ImageUploadField value={item.photo_url} onChange={(url) => list.update(i, 'photo_url', url)} />
+            <ItemControls onUp={() => list.move(i, -1)} onDown={() => list.move(i, 1)} onRemove={() => list.remove(i)} />
+          </div>
+        ))}
+        <button type="button" className="btn small ghost" onClick={() => list.add({ quote: '', author: '', detail: '', photo_url: '' })}>
+          + Ajouter un témoignage
+        </button>
       </>
     )
   }

@@ -5,6 +5,9 @@ import ServiceList from './blocks/ServiceList'
 import TextImage from './blocks/TextImage'
 import RichText from './blocks/RichText'
 import ContactBlock from './blocks/ContactBlock'
+import Gallery from './blocks/Gallery'
+import Stats from './blocks/Stats'
+import Testimonials from './blocks/Testimonials'
 
 // Pour ajouter un nouveau type de bloc :
 // 1. Créer le composant dans src/components/blocks/
@@ -18,6 +21,9 @@ const REGISTRY = {
   text_image: TextImage,
   rich_text: RichText,
   contact: ContactBlock,
+  gallery: Gallery,
+  stats: Stats,
+  testimonials: Testimonials,
 }
 
 export default function BlockRenderer({ block }) {

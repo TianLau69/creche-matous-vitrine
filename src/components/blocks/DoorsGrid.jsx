@@ -15,8 +15,10 @@ export default function DoorsGrid({ content }) {
           {items.map((door, i) => {
             const internal = door.link?.startsWith('/')
             const commonProps = {
-              className: 'door',
-              style: { background: door.color || 'var(--blue)' },
+              className: `door${door.image_url ? ' has-photo' : ''}`,
+              style: door.image_url
+                ? { backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0.05), ${door.color || 'var(--blue)'} 78%), url(${door.image_url})` }
+                : { background: door.color || 'var(--blue)' },
             }
             const inner = (
               <>

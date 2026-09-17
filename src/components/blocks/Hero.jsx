@@ -12,7 +12,7 @@ function CtaLink({ label, link, className }) {
 }
 
 export default function Hero({ content }) {
-  const { title, subtitle, primary_label, primary_link, secondary_label, secondary_link } = content || {}
+  const { title, subtitle, primary_label, primary_link, secondary_label, secondary_link, image_url } = content || {}
   return (
     <section className="block-hero">
       <div className="wrap">
@@ -24,6 +24,11 @@ export default function Hero({ content }) {
             <CtaLink className="btn ghost" label={secondary_label} link={secondary_link} />
           </div>
         </div>
+        {image_url ? (
+          <div className="hero-photo">
+            <img src={image_url} alt={title || ''} />
+          </div>
+        ) : (
         <div aria-hidden="true">
           <svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
             <rect x="40" y="30" width="340" height="360" rx="18" fill="var(--paper)" stroke="var(--line)" strokeWidth="2"/>
@@ -47,6 +52,7 @@ export default function Hero({ content }) {
             <ellipse cx="158" cy="322" rx="26" ry="16" fill="var(--green)" opacity="0.75"/>
           </svg>
         </div>
+        )}
       </div>
     </section>
   )

@@ -186,4 +186,27 @@ begin
     from blocks b join pages p on p.id = b.page_id
     where p.slug = 'accueil' and b.type = 'doors_grid';
   end if;
+
+  -- 11. Page "Boutique solidaire" — brouillon avec blocs vides, à compléter depuis /admin.
+  --     is_published = false : invisible publiquement tant que tu ne cliques pas sur "Publier".
+  if not exists (select 1 from pages where slug = 'boutique-solidaire') then
+    insert into pages (slug, title, nav_label, nav_order, show_in_nav, is_published)
+    values ('boutique-solidaire', 'Boutique solidaire — Crèche Matous', 'Boutique solidaire', 3, true, false)
+    returning id into home_id;
+
+    insert into blocks (page_id, type, position, content) values
+    (home_id, 'rich_text', 0, '{
+      "title": "Boutique solidaire",
+      "text": "Chaque achat dans notre boutique solidaire soutient une cause animale locale. Page en préparation — texte, produits et partenaires à compléter depuis l''admin."
+    }'::jsonb),
+    (home_id, 'gallery', 1, '{
+      "title": "Aperçu de la boutique",
+      "subtitle": "",
+      "items": [
+        {"image_url": "", "caption": "", "size": "normal"},
+        {"image_url": "", "caption": "", "size": "normal"},
+        {"image_url": "", "caption": "", "size": "normal"}
+      ]
+    }'::jsonb);
+  end if;
 end $$;

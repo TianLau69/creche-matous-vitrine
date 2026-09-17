@@ -13,7 +13,11 @@ export default function ServiceList({ content }) {
         )}
         {items.map((service, i) => (
           <div className="service-row" key={i}>
-            <ServiceIcon icon={service.icon} color={['var(--blue)', 'var(--orange)', 'var(--green)'][i % 3]} />
+            {service.image_url ? (
+              <img className="service-photo" src={service.image_url} alt={service.title || ''} />
+            ) : (
+              <ServiceIcon icon={service.icon} color={['var(--blue)', 'var(--orange)', 'var(--green)'][i % 3]} />
+            )}
             <div>
               <h3>{service.title}</h3>
               <p>{service.description}</p>
